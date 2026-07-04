@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  # ── MongoDB ───────────────────────────────────────────────
+  mongo:
+    image: mongo:7.0
+    container_name: ai_biz_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: ai_business_assistant
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── Mongo Express (optional GUI) ──────────────────────────
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: ai_biz_mongo_express
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+      ME_CONFIG_BASICAUTH: "false"
+    profiles:
+      - tools   # only starts with: docker-compose --profile tools up
+
+volumes:
+  mongo_data:
