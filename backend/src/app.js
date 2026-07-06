@@ -20,11 +20,27 @@ const app = express();
 
 // ─── Security & Compression ───────────────────────────────
 app.use(helmet());
+// CORS — in production, allow only origins listed in ALLOWED_ORIGINS env var
+// e.g. ALLOWED_ORIGINS=https://ai-buisness-assistant.vercel.app,https://yourdomain.com
+const allowedOrigins = env.isProduction
+  ? (process.env.ALLOWED_ORIGINS ?? '').split(',').map(o => o.trim()).filter(Boolean)
+  : ['http://localhost:5173', 'http://localhost:5174'];
+
 app.use(cors({
-  origin: env.isProduction ? process.env.ALLOWED_ORIGINS?.split(',') : '*',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    if (!env.isProduction) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS: origin ${origin} not allowed`));
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 }));
+
+// Handle preflight requests for all routes
+app.options('*', cors());
 app.use(compression());
 
 // ─── Body Parsing ─────────────────────────────────────────

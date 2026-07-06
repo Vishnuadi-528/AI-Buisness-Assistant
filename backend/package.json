@@ -2,14 +2,15 @@
   "name": "ai-business-assistant",
   "version": "1.0.0",
   "description": "AI-powered business assistant backend — generates master business reports via LLM",
-  "main": "src/server.js",
+  "main": "api/index.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "db:seed": "node src/db/seed.js",
     "test": "jest --runInBand",
     "test:unit": "jest tests/unit --runInBand",
-    "test:coverage": "jest --coverage --runInBand"
+    "test:coverage": "jest --coverage --runInBand",
+    "vercel-build": "echo 'No build step required for Node.js'"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
