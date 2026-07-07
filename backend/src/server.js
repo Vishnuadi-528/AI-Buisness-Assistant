@@ -5,10 +5,10 @@ const env = require('./config/env');
 const logger = require('./config/logger');
 const { connectDB, disconnectDB } = require('./config/db');
 
-const PORT = env.PORT;
+// Always read PORT from process.env directly — platforms inject it at runtime
+const PORT = parseInt(process.env.PORT ?? '3000', 10);
 
 async function start() {
-  // Verify MongoDB connection before accepting traffic
   try {
     await connectDB();
   } catch (err) {
@@ -36,7 +36,6 @@ async function start() {
     );
   });
 
-  // ─── Graceful Shutdown ──────────────────────────────────
   async function shutdown(signal) {
     logger.info({ signal }, 'Shutdown signal received — closing gracefully...');
     server.close(async () => {
@@ -45,7 +44,6 @@ async function start() {
       process.exit(0);
     });
 
-    // Force exit after 10s if server is stuck
     setTimeout(() => {
       logger.warn('Forcing exit after 10s timeout.');
       process.exit(1);
