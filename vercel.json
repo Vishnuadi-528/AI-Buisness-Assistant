@@ -12,24 +12,18 @@
       "src": "backend/api/index.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["backend/src/**"]
+        "includeFiles": "backend/src/**"
       }
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "/backend/api/index.js"
+      "src": "/api/(.*)",
+      "dest": "/backend/api/index.js"
     },
     {
-      "source": "/(.*)",
-      "destination": "/frontend/dist/index.html"
+      "src": "/(.*)",
+      "dest": "/frontend/dist/index.html"
     }
-  ],
-  "functions": {
-    "backend/api/index.js": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
-  }
+  ]
 }
